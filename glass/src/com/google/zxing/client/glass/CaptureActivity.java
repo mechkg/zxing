@@ -17,8 +17,10 @@
 package com.google.zxing.client.glass;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +32,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import com.google.android.glass.media.Sounds;
 import com.google.zxing.Result;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ParsedResultType;
@@ -53,6 +56,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private Camera camera;
   private DecodeRunnable decodeRunnable;
   private Result result;
+  private AudioManager audioManager;
 
   @Override
   public void onCreate(Bundle icicle) {
@@ -71,6 +75,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     setContentView(R.layout.capture);
   }
 
@@ -170,6 +175,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   }
 
   void setResult(Result result) {
+    audioManager.playSoundEffect(Sounds.SUCCESS);
+
     if (returnResult) {
       Intent scanResult = new Intent();
       scanResult.putExtra("SCAN_RESULT", result.getText());
